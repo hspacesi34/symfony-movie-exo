@@ -1,0 +1,140 @@
+<?php
+
+namespace App\Controller;
+
+use App\Entity\{User, Movie, Director, Category};
+use App\Repository\CategoryRepository;
+use App\Repository\DirectorRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\MovieRepository;
+use App\Repository\UserRepository;
+
+final class MovieController extends AbstractController
+{
+    public function __construct(
+        private SerializerInterface $serializer,
+        private EntityManagerInterface $em,
+        private MovieRepository $mr,
+        private DirectorRepository $dr,
+        private UserRepository $ur,
+        private CategoryRepository $cr
+    ) {}
+
+    #[Route('/movies', name: 'app_movies', methods: ['GET'])]
+    public function getAll(): JsonResponse
+    {
+        $movies = $this->mr->findAll();
+        return $this->json($movies, context: [
+            'groups' => ['movie-read', 'category-read', 'user-read', 'director-read']
+        ]);
+    }
+
+    #[Route('/movie/{id}', name: 'app_movie', methods: ['GET'])]
+    public function getOne(int $id): JsonResponse
+    {
+        $movie = $this->mr->find($id);
+        return $this->json($movie, context: [
+            'groups' => ['movie-read', 'category-read', 'user-read', 'director-read']
+        ]);
+    }
+
+    #[Route('/movie/add', name: 'app_movie_add', methods: ['POST'])]
+    public function addMovie(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $movie = $this->serializer->deserialize($request->getContent(), Movie::class, "json", context: ['groups' => ['movie-write']]);
+
+        if (isset($data['user']['id'])) {
+            $user = $this->ur->find($data['user']['id']);
+            $movie->setUser($user);
+        }
+
+        if (isset($data['directors'])) {
+            foreach ($data['directors'] as $dirData) {
+                $director = $this->dr->find($dirData['id']);
+                if ($director) {
+                    $movie->addDirector($director);
+                }
+            }
+        }
+
+        if (isset($data['categories'])) {
+            foreach ($data['categories'] as $catData) {
+                $category = $this->cr->find($catData['id']);
+                if ($category) {
+                    $movie->addCategory($category);
+                }
+            }
+        }
+        $this->em->persist($movie);
+        $this->em->flush();
+        return $this->json(["message" => "Movie '" . $movie->getTitleMovie() . "' bien enregistré!"]);
+    }
+
+    #[Route('/movie/{id}', name: 'app_movie_update', methods: ['PUT'])]
+    public function updateMovie(Request $request, int $id): JsonResponse
+    {
+        $movie = $this->mr->find($id);
+
+        if (!$movie) {
+            return $this->json(['error' => 'Movie pas trouvé'], 404);
+        }
+
+        $data = json_decode($request->getContent(), true);
+
+        $this->serializer->deserialize(
+            $request->getContent(),
+            Movie::class,
+            'json',
+            [
+                'groups' => ['movie-write'],
+                'object_to_populate' => $movie
+            ]
+        );
+
+        if (!empty($data['user']['id'])) {
+            $user = $this->ur->find((int) $data['user']['id']);
+            $movie->setUser($user);
+        }
+
+        if (isset($data['directors'])) {
+            $movie->clearDirectors();
+            foreach ($data['directors'] as $dirData) {
+                $director = $this->dr->find((int) $dirData['id']);
+                if ($director) {
+                    $movie->addDirector($director);
+                }
+            }
+        }
+
+        if (isset($data['categories'])) {
+            $movie->clearCategories();
+            foreach ($data['categories'] as $catData) {
+                $category = $this->cr->find((int) $catData['id']);
+                if ($category) {
+                    $movie->addCategory($category);
+                }
+            }
+        }
+
+        $this->em->flush();
+
+        return $this->json([
+            "message" => "Movie '" . $movie->getTitleMovie() . "' bien mis à jour !"
+        ]);
+    }
+
+    #[Route('/movie/{id}', name: 'app_movie_delete', methods: ['DELETE'])]
+    public function deleteOne(int $id): JsonResponse
+    {
+        $movie = $this->mr->find($id);
+        $this->em->remove($movie);
+        $this->em->flush();
+        return $this->json(["message" => "Movie '" . $movie->getTitleMovie() . "' bien effacé!"]);
+    }
+}
