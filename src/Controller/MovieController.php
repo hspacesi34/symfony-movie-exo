@@ -14,6 +14,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\MovieRepository;
 use App\Repository\UserRepository;
 
+#[Route('/movie')]
 final class MovieController extends AbstractController
 {
     public function __construct(
@@ -25,7 +26,7 @@ final class MovieController extends AbstractController
         private CategoryRepository $cr
     ) {}
 
-    #[Route('/movies', name: 'app_movies', methods: ['GET'])]
+    #[Route('/all', name: 'app_movies', methods: ['GET'])]
     public function getAll(): JsonResponse
     {
         $movies = $this->mr->findAll();
@@ -34,7 +35,7 @@ final class MovieController extends AbstractController
         ]);
     }
 
-    #[Route('/movie/{id}', name: 'app_movie', methods: ['GET'])]
+    #[Route('/one/{id}', name: 'app_movie', methods: ['GET'])]
     public function getOne(int $id): JsonResponse
     {
         $movie = $this->mr->find($id);
@@ -43,7 +44,7 @@ final class MovieController extends AbstractController
         ]);
     }
 
-    #[Route('/movie/add', name: 'app_movie_add', methods: ['POST'])]
+    #[Route('/add', name: 'app_movie_add', methods: ['POST'])]
     public function addMovie(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -73,7 +74,7 @@ final class MovieController extends AbstractController
         return $this->json(["message" => "Movie '" . $movie->getTitleMovie() . "' bien enregistré!"]);
     }
 
-    #[Route('/movie/{id}', name: 'app_movie_update', methods: ['PUT'])]
+    #[Route('/update/{id}', name: 'app_movie_update', methods: ['PUT'])]
     public function updateMovie(Request $request, int $id): JsonResponse
     {
         $movie = $this->mr->find($id);
@@ -126,7 +127,7 @@ final class MovieController extends AbstractController
         ]);
     }
 
-    #[Route('/movie/{id}', name: 'app_movie_delete', methods: ['DELETE'])]
+    #[Route('/delete/{id}', name: 'app_movie_delete', methods: ['DELETE'])]
     public function deleteOne(int $id): JsonResponse
     {
         $movie = $this->mr->find($id);

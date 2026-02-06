@@ -17,43 +17,49 @@ class AppFixtures extends Fixture
         $users = [];
         $directors = [];
 
-        for ($i=0; $i < 10; $i++) { 
+        for ($i = 0; $i < 10; $i++) {
             $cat = (new Category())
-                    ->setNameCat($faker->unique()->word());
+                ->setNameCat($faker->unique()->word());
             $categories[] = $cat;
             $manager->persist($cat);
         }
 
-        for ($i=0; $i < 10; $i++) { 
+        for ($i = 0; $i < 10; $i++) {
             $user = (new User())
-                    ->setNameUser($faker->lastName())
-                    ->setFirstNameUser($faker->firstName())
-                    ->setEmailUser($faker->unique()->email())
-                    ->setPasswordUser($faker->password(6, 100))
-                    ->setCreatedAt(new \DateTimeImmutable());
+                ->setNameUser($faker->lastName())
+                ->setFirstNameUser($faker->firstName())
+                ->setEmailUser($faker->unique()->email())
+                ->setPasswordUser($faker->password(6, 100))
+                ->setCreatedAt(new \DateTimeImmutable());
             $users[] = $user;
             $manager->persist($user);
         }
 
-        for ($i=0; $i < 10; $i++) { 
+        for ($i = 0; $i < 10; $i++) {
             $director = (new Director())
-                    ->setNameDirector($faker->lastName())
-                    ->setFirstnameDirector($faker->firstName())
-                    ->setDayOfBirth(new \DateTimeImmutable($faker->date('Y-m-d', '2000-01-01')))
-                    ->setCountryDirector($faker->word());
+                ->setNameDirector($faker->lastName())
+                ->setFirstnameDirector($faker->firstName())
+                ->setDayOfBirth(new \DateTimeImmutable($faker->date('Y-m-d', '2000-01-01')))
+                ->setCountryDirector($faker->country());
             $directors[] = $director;
             $manager->persist($director);
         }
 
-        for ($i=0; $i < 10; $i++) { 
+        for ($i = 0; $i < 10; $i++) {
             $movie = (new Movie())
-                    ->setTitleMovie($faker->sentence())
-                    ->setSynopsisMovie($faker->paragraphs('3', true))
-                    ->setImageCover($faker->imageUrl())
-                    ->setCreatedAt(new \DateTimeImmutable())
-                    ->setUser($users[rand(0, (count($users)-1))])
-                    ->addDirector($directors[rand(0, (count($directors)-1))])
-                    ->addCategory($categories[rand(0, (count($categories)-1))]);
+                ->setTitleMovie($faker->sentence())
+                ->setSynopsisMovie($faker->paragraphs('3', true))
+                ->setImageCover($faker->imageUrl())
+                ->setCreatedAt(new \DateTimeImmutable())
+                ->setUser($users[rand(0, (count($users) - 1))]);
+            $randomDirectors = $faker->randomElements($directors, null, false);
+            foreach ($randomDirectors as $director) {
+                $movie->addDirector($director);
+            }
+            $randomCategories = $faker->randomElements($categories, null, false);
+            foreach ($randomCategories as $category) {
+                $movie->addCategory($category);
+            }
             $manager->persist($movie);
         }
 
