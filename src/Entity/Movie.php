@@ -147,6 +147,13 @@ class Movie
         return $this;
     }
 
+    public function clearDirector(): static
+    {
+        $this->director = new ArrayCollection();
+
+        return $this;
+    }
+
     /**
      * @return Collection<int, Category>
      */
@@ -167,6 +174,13 @@ class Movie
     public function removeCategory(Category $category): static
     {
         $this->category->removeElement($category);
+
+        return $this;
+    }
+
+    public function clearCategory(): static
+    {
+        $this->category = new ArrayCollection();
 
         return $this;
     }

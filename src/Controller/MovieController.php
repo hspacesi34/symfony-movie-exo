@@ -50,27 +50,24 @@ final class MovieController extends AbstractController
         $movie = $this->serializer->deserialize($request->getContent(), Movie::class, "json", context: ['groups' => ['movie-write']]);
 
         if (isset($data['user']['id'])) {
-            $user = $this->ur->find($data['user']['id']);
+            $user = $this->em->getReference(User::class, $data['user']['id']);
             $movie->setUser($user);
         }
 
         if (isset($data['directors'])) {
             foreach ($data['directors'] as $dirData) {
-                $director = $this->dr->find($dirData['id']);
-                if ($director) {
-                    $movie->addDirector($director);
-                }
+                $director = $this->em->getReference(Director::class, $dirData['id']);
+                $movie->addDirector($director);
             }
         }
 
         if (isset($data['categories'])) {
             foreach ($data['categories'] as $catData) {
-                $category = $this->cr->find($catData['id']);
-                if ($category) {
-                    $movie->addCategory($category);
-                }
+                $category = $this->em->getReference(Category::class, $catData['id']);
+                $movie->addCategory($category);
             }
         }
+
         $this->em->persist($movie);
         $this->em->flush();
         return $this->json(["message" => "Movie '" . $movie->getTitleMovie() . "' bien enregistré!"]);
@@ -98,14 +95,14 @@ final class MovieController extends AbstractController
         );
 
         if (!empty($data['user']['id'])) {
-            $user = $this->ur->find((int) $data['user']['id']);
+            $user = $this->em->getReference(User::class, $data['user']['id']);
             $movie->setUser($user);
         }
 
         if (isset($data['directors'])) {
-            $movie->clearDirectors();
+            $movie->clearDirector();
             foreach ($data['directors'] as $dirData) {
-                $director = $this->dr->find((int) $dirData['id']);
+                $director = $this->em->getReference(Director::class, $dirData['id']);
                 if ($director) {
                     $movie->addDirector($director);
                 }
@@ -113,9 +110,9 @@ final class MovieController extends AbstractController
         }
 
         if (isset($data['categories'])) {
-            $movie->clearCategories();
+            $movie->clearCategory();
             foreach ($data['categories'] as $catData) {
-                $category = $this->cr->find((int) $catData['id']);
+                $category = $this->em->getReference(Category::class, $catData['id']);
                 if ($category) {
                     $movie->addCategory($category);
                 }
