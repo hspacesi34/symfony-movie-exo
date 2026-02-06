@@ -15,23 +15,23 @@ class Director
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups('director-read')]
+    #[Groups('movie-read')]
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
-    #[Groups('director-read')]
+    #[Groups('movie-read')]
     private ?string $name_director = null;
 
     #[ORM\Column(length: 50)]
-    #[Groups('director-read')]
+    #[Groups('movie-read')]
     private ?string $firstname_director = null;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
-    #[Groups('director-read')]
+    #[Groups('movie-read')]
     private ?\DateTimeImmutable $day_of_birth = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Groups('director-read')]
+    #[Groups('movie-read')]
     private ?string $country_director = null;
 
     /**

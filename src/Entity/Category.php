@@ -14,11 +14,11 @@ class Category
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups('category-read')]
+    #[Groups('movie-read')]
     private ?int $id = null;
 
     #[ORM\Column(length: 50, unique: true)]
-    #[Groups('category-read')]
+    #[Groups('movie-read')]
     private ?string $name_cat = null;
 
     /**

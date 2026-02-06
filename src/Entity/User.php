@@ -14,26 +14,26 @@ class User
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups('user-read')]
+    #[Groups('movie-read')]
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
-    #[Groups('user-read')]
+    #[Groups('movie-read')]
     private ?string $name_user = null;
 
     #[ORM\Column(length: 50)]
-    #[Groups('user-read')]
+    #[Groups('movie-read')]
     private ?string $firstname_user = null;
 
     #[ORM\Column(length: 50, unique: true)]
-    #[Groups('user-read')]
+    #[Groups('movie-read')]
     private ?string $email_user = null;
 
     #[ORM\Column(length: 100)]
     private ?string $password_user = null;
 
     #[ORM\Column]
-    #[Groups('user-read')]
+    #[Groups('movie-read')]
     private ?\DateTimeImmutable $createdAt = null;
 
     /**

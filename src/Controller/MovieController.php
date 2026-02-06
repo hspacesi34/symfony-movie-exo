@@ -30,7 +30,7 @@ final class MovieController extends AbstractController
     {
         $movies = $this->mr->findAll();
         return $this->json($movies, context: [
-            'groups' => ['movie-read', 'category-read', 'user-read', 'director-read']
+            'groups' => ['movie-read']
         ]);
     }
 
@@ -39,7 +39,7 @@ final class MovieController extends AbstractController
     {
         $movie = $this->mr->find($id);
         return $this->json($movie, context: [
-            'groups' => ['movie-read', 'category-read', 'user-read', 'director-read']
+            'groups' => ['movie-read']
         ]);
     }
 
